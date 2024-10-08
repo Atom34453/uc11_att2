@@ -56,6 +56,34 @@ public class ProdutosDAO {
         return listagem;
     }
 
+    // Método para listar produtos com base no status
+    public ArrayList<ProdutosDTO> listarProdutosPorStatus(String status) {
+        String sql = "SELECT * FROM produtos WHERE status = ?";
+        ArrayList<ProdutosDTO> listagem = new ArrayList<>();
+        
+        try {
+            conn = new ConectaDAO().connectDB();
+            prep = conn.prepareStatement(sql);
+            prep.setString(1, status);
+            resultset = prep.executeQuery();
+            
+            while (resultset.next()) {
+                ProdutosDTO produto = new ProdutosDTO();
+                produto.setId(resultset.getInt("id"));
+                produto.setNome(resultset.getString("nome"));
+                produto.setValor(resultset.getDouble("valor"));
+                produto.setStatus(resultset.getString("status"));
+                listagem.add(produto);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao listar produtos por status: " + e.getMessage());
+        } finally {
+            try { resultset.close(); prep.close(); conn.close(); } catch (Exception ex) { /* Handle exceptions */ }
+        }
+        
+        return listagem;
+    }
+
     // Método para vender um produto (atualizar status para "Vendido")
     public void venderProduto(int produtoId) {
         String sql = "UPDATE produtos SET status = 'Vendido' WHERE id = ?";
